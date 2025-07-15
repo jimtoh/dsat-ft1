@@ -3,7 +3,7 @@ import joblib
 from groq import Groq
 
 import os
-# os.environ['GROQ_API_KEY'] = os.getenv("groq")
+os.environ['GROQ_API_KEY'] = os.getenv("groq")
 
 app = Flask(__name__)
 
@@ -39,11 +39,11 @@ def llama_reply():
 ###
 
 @app.route("/deepseek",methods=["GET","POST"])
-def llama():
+def deepseek():
     return(render_template("deepseek.html"))
 
 @app.route("/deepseek_reply",methods=["GET","POST"])
-def llama_reply():
+def deepseek_reply():
     q = request.form.get("q")
     # load model
     client = Groq()
