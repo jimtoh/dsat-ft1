@@ -3,7 +3,15 @@ import joblib
 from groq import Groq
 
 import os
-os.environ['GROQ_API_KEY'] = os.getenv("groq")
+# if os.getenv("groq") is not valid, get the api key from the .key directory and groq.txt file
+if not os.getenv("groq"):
+    try:
+        with open(".key/groq.txt", "r") as f:
+            os.environ['GROQ_API_KEY'] = f.read().strip()
+    except FileNotFoundError:
+        raise Exception("GROQ API key not found. Please set the environment variable 'groq' or create a .key/groq.txt file with your API key.")
+else:
+    os.environ['GROQ_API_KEY'] = os.getenv("groq")
 
 app = Flask(__name__)
 
