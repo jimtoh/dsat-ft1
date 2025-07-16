@@ -1,18 +1,10 @@
 from flask import Flask, render_template, request
 import joblib
 from groq import Groq
-import requests
 
 import os
-# if os.getenv("groq") is not valid, get the api key from the .key directory and groq.txt file
-if not os.getenv("groq"):
-    try:
-        with open(".key/groq.txt", "r") as f:
-            os.environ['GROQ_API_KEY'] = f.read().strip()
-    except FileNotFoundError:
-        raise Exception("GROQ API key not found. Please set the environment variable 'groq' or create a .key/groq.txt file with your API key.")
-else:
-    os.environ['GROQ_API_KEY'] = os.getenv("groq")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 app = Flask(__name__)
 
@@ -25,8 +17,6 @@ def main():
     q = request.form.get("q")
     # db
     return(render_template("main.html"))
-
-################## main #######################
 
 @app.route("/llama",methods=["GET","POST"])
 def llama():
@@ -47,7 +37,6 @@ def llama_reply():
         ]
     )
     return(render_template("llama_reply.html",r=completion.choices[0].message.content))
-################## llama #######################
 
 @app.route("/deepseek",methods=["GET","POST"])
 def deepseek():
@@ -58,7 +47,7 @@ def deepseek_reply():
     q = request.form.get("q")
     # load model
     client = Groq()
-    completion = client.chat.completions.create(
+    completion_ds = client.chat.completions.create(
         model="deepseek-r1-distill-llama-70b",
         messages=[
             {
@@ -67,10 +56,7 @@ def deepseek_reply():
             }
         ]
     )
-    return(render_template("deepseek_reply.html",r=completion.choices[0].message.content))
-
-################## deepseek  #######################
-
+    return(render_template("deepseek_reply.html",r=completion_ds.choices[0].message.content))
 
 @app.route("/dbs",methods=["GET","POST"])
 def dbs():
@@ -85,7 +71,7 @@ def prediction():
     pred = model.predict([[q]])
     return(render_template("prediction.html",r=pred))
 
-################## prediction #######################
+import requests
 
 @app.route("/telegram",methods=["GET","POST"])
 def telegram():
@@ -109,8 +95,5 @@ def telegram():
     return(render_template("telegram.html", status=status))
 
 
-################## telegram #######################
-
 if __name__ == "__main__":
     app.run()
-
