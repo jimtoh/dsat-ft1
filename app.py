@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import joblib
 from groq import Groq
+import requests
 
 import os
 # if os.getenv("groq") is not valid, get the api key from the .key directory and groq.txt file
@@ -25,6 +26,8 @@ def main():
     # db
     return(render_template("main.html"))
 
+################## main #######################
+
 @app.route("/llama",methods=["GET","POST"])
 def llama():
     return(render_template("llama.html"))
@@ -44,7 +47,7 @@ def llama_reply():
         ]
     )
     return(render_template("llama_reply.html",r=completion.choices[0].message.content))
-###
+################## llama #######################
 
 @app.route("/deepseek",methods=["GET","POST"])
 def deepseek():
@@ -66,7 +69,7 @@ def deepseek_reply():
     )
     return(render_template("deepseek_reply.html",r=completion.choices[0].message.content))
 
-###
+################## deepseek  #######################
 
 
 @app.route("/dbs",methods=["GET","POST"])
@@ -81,6 +84,32 @@ def prediction():
     # make prediction
     pred = model.predict([[q]])
     return(render_template("prediction.html",r=pred))
+
+################## prediction #######################
+
+@app.route("/telegram",methods=["GET","POST"])
+def telegram():
+    domain_url = 'https://dsat-ft1.onrender.com'
+    # The following line is used to delete the existing webhook URL for the Telegram bot
+
+    # The following line is used to delete the existing webhook URL for the Telegram bot
+    delete_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteWebhook"
+    requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+
+    # Set the webhook URL for the Telegram bot
+    set_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/setWebhook?url={domain_url}/webhook"
+    webhook_response = requests.post(set_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+
+    if webhook_response.status_code == 200:
+        # set status message
+        status = "The telegram bot is running. Please check with the telegram bot. @your_bot"
+    else:
+        status = "Failed to start the telegram bot. Please check the logs."
+    
+    return(render_template("telegram.html", status=status))
+
+
+################## telegram #######################
 
 if __name__ == "__main__":
     app.run()
