@@ -75,7 +75,8 @@ import requests
 
 @app.route("/telegram",methods=["GET","POST"])
 def telegram():
-    domain_url = 'https://dsat-ft1.onrender.com'
+    # domain_url = 'https://dsat-ft1.onrender.com'
+    domain_url = 'https://dbss-bwr4.onrender.com'
     # The following line is used to delete the existing webhook URL for the Telegram bot
 
     # The following line is used to delete the existing webhook URL for the Telegram bot
